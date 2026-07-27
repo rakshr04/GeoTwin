@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { GeotwinLogo } from '../shared/GeotwinLogo';
 
 const Typewriter: React.FC<{ text: string; delay?: number; speed?: number }> = ({ text, delay = 0, speed = 40 }) => {
@@ -7,12 +7,12 @@ const Typewriter: React.FC<{ text: string; delay?: number; speed?: number }> = (
 
   React.useEffect(() => {
     let index = 0;
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setTimeout>;
     
     const startTyping = () => {
       timer = setInterval(() => {
         if (index < text.length) {
-          setDisplayedText((prev) => text.substring(0, index + 1));
+          setDisplayedText(text.substring(0, index + 1));
           index++;
         }
         if (index >= text.length) {
@@ -80,7 +80,7 @@ export const AuthBranding: React.FC = () => {
 
       {/* Earth Coordinate Telemetry */}
       <div className="absolute -left-16 -bottom-40 font-mono text-[7.5px] text-[#8A956B]/30 tracking-[0.25em] uppercase select-none hidden lg:block">
-        Ecosystem Grid Ref: 45.362° N, 122.188° W // Elevation: 1420m
+        Ecosystem Grid Ref: 45.362Â° N, 122.188Â° W // Elevation: 1420m
       </div>
       {/* Live System Operational Indicator */}
       <div className="flex items-center space-x-2 bg-[#1b261b]/60 border border-[#2d402d]/60 px-3 py-1 rounded-full w-fit animate-fade-in opacity-0" style={{ animationDelay: '0.1s' }}>
@@ -154,3 +154,4 @@ export const AuthBranding: React.FC = () => {
 };
 
 export default AuthBranding;
+

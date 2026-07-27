@@ -9,8 +9,8 @@ async function seed(){
   const users=AppDataSource.getRepository(User),profiles=AppDataSource.getRepository(OfficerProfile),regions=AppDataSource.getRepository(Region);
   const state=await regions.save(regions.create({name:'Telangana',type:'STATE',code:'TG'}));
   const rr=await regions.save(regions.create({name:'Rangareddy',type:'DISTRICT',code:'RR',parentId:state.id}));
-  const medak=await regions.save(regions.create({name:'Medak',type:'DISTRICT',code:'MDK',parentId:state.id}));
-  const nlg=await regions.save(regions.create({name:'Nalgonda',type:'DISTRICT',code:'NLG',parentId:state.id}));
+  await regions.save(regions.create({name:'Medak',type:'DISTRICT',code:'MDK',parentId:state.id}));
+  await regions.save(regions.create({name:'Nalgonda',type:'DISTRICT',code:'NLG',parentId:state.id}));
   const mandal=await regions.save(regions.create({name:'Shankarpally',type:'MANDAL',parentId:rr.id}));
   const village=await regions.save(regions.create({name:'Mokila',type:'VILLAGE',parentId:mandal.id}));
   const passwordHash=await bcrypt.hash('GeoTwinDemo@2026',12);

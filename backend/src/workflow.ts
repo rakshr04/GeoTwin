@@ -2,7 +2,7 @@ import { Body, Controller, ForbiddenException, Get, Injectable, Module, NotFound
 import { InjectDataSource, InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { IsEnum, IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
-import { ApiException, AuthenticatedUser, CaseStatus, CurrentUser, ErrorCode, EvidenceStatus, MissionStatus, OfficerRole, PlanStatus, PlanType, Roles } from './common';
+import { ApiException, AuthenticatedUser, CaseStatus, CurrentUser, ErrorCode, EvidenceStatus, MissionStatus, OfficerRole, PlanStatus, PlanType } from './common';
 import { AuditEvent, EvidenceGap, EvidenceItem, FieldMission, LandPatch, Milestone, MonitoringEvent, PlanVersion, RestorationCase, TechnicalAssessment, TechnicalModule } from './entities';
 import { ScopePolicy } from './database';
 

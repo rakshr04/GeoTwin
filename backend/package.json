@@ -14,11 +14,14 @@
     "db:down": "docker compose down",
     "migration:run": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:run",
     "migration:revert": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:revert",
-    "seed": "ts-node -r tsconfig-paths/register src/database/seed.ts"
+    "seed": "ts-node -r tsconfig-paths/register src/database/seed.ts",
+    "seed:profiles": "ts-node -r tsconfig-paths/register src/database/seed-profiles.ts",
+    "seed:demo-assignment": "ts-node -r tsconfig-paths/register src/database/seed-demo-assignment.ts"
   },
   "dependencies": {
     "@fastify/helmet": "^13.0.0",
     "@fastify/multipart": "^9.0.0",
+    "@fastify/static": "^9.3.0",
     "@nestjs/common": "11.1.28",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "11.1.28",
@@ -27,6 +30,7 @@
     "@nestjs/platform-fastify": "11.1.28",
     "@nestjs/swagger": "^11.2.0",
     "@nestjs/typeorm": "11.0.3",
+    "@supabase/supabase-js": "^2.110.9",
     "@turf/turf": "^7.2.0",
     "bcryptjs": "^3.0.2",
     "class-transformer": "^0.5.1",
@@ -55,10 +59,16 @@
     "typescript": "^5.8.3"
   },
   "jest": {
-    "moduleFileExtensions": ["js", "json", "ts"],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
-    "transform": {"^.+\\.(t|j)s$": "ts-jest"},
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
     "testEnvironment": "node"
   }
 }
