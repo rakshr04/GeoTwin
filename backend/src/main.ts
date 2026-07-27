@@ -1,0 +1,11 @@
+import 'reflect-metadata';
+import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { ConfigService } from '@nestjs/config';
+import helmet from '@fastify/helmet';
+import multipart from '@fastify/multipart';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ApiExceptionFilter, EnvelopeInterceptor } from './common';
+import { AppModule } from './app.module';
+async function bootstrap(){const app=await NestFactory.create<NestFastifyApplication>(AppModule,new FastifyAdapter({bodyLimit:10_485_760}));const c=app.get(ConfigService);await app.register(helmet,{contentSecurityPolicy:false});await app.register(multipart,{limits:{fileSize:10_485_760,files:10}});app.enableCors({origin:c.get('FRONTEND_ORIGIN','http://localhost:5173'),credentials:true});app.setGlobalPrefix(c.get('API_PREFIX','api/v1'));app.useGlobalPipes(new ValidationPipe({whitelist:true,forbidNonWhitelisted:true,transform:true}));app.useGlobalInterceptors(new EnvelopeInterceptor());app.useGlobalFilters(new ApiExceptionFilter());SwaggerModule.setup('docs',app,SwaggerModule.createDocument(app,new DocumentBuilder().setTitle('GeoTwin API').setVersion('3.0').addBearerAuth().build()));app.enableShutdownHooks();await app.listen(Number(c.get('PORT',4000)),'0.0.0.0')}void bootstrap();
