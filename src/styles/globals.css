@@ -1,0 +1,120 @@
+@import url("https://fonts.googleapis.com/css2?family=Iceberg&family=Orbitron:wght@500;600;700&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
+@import "tailwindcss";
+
+:root {
+  --bg-black: #0A0F14;
+  --bg-deep: #101820;
+  --bg-surface: #14212B;
+  --surface-raised: #1B2B36;
+
+  --text-primary: #F5F9FC;
+  --text-secondary: #B8C7D1;
+  --text-muted: #7E95A3;
+
+  --accent-blue: #4DA3FF;
+  --accent-teal: #2EC4B6;
+  --accent-green: #79D67C;
+  --accent-white: #EAF4FF;
+
+  /* Keep legacy variable names mapped to new ones for compatibility */
+  --background-deep: var(--bg-black);
+  --background-main: var(--bg-deep);
+  --surface-primary: var(--bg-surface);
+  --surface-secondary: var(--surface-raised);
+  --surface-raised-legacy: #525943;
+
+  --border-muted: #1B2B36;
+  --olive-primary: var(--accent-green);
+  --olive-bright: #A5B17C;
+  --warm-sand: #C9B990;
+  --earth-brown: #77664E;
+}
+
+@theme {
+  --color-bg-black: var(--bg-black);
+  --color-bg-deep: var(--bg-deep);
+  --color-bg-surface: var(--bg-surface);
+  --color-surface-raised: var(--surface-raised);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-teal: var(--accent-teal);
+  --color-accent-green: var(--accent-green);
+  --color-accent-white: var(--accent-white);
+
+  --color-background-deep: var(--background-deep);
+  --color-background-main: var(--background-main);
+  --color-surface-primary: var(--surface-primary);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-border-muted: var(--border-muted);
+  --color-olive-primary: var(--olive-primary);
+  --font-sans: 'Inter', 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-manrope: 'Manrope', sans-serif;
+  --font-instrument: 'Instrument Serif', serif;
+  --font-orbitron: 'Orbitron', sans-serif;
+  --font-iceberg: 'Iceberg', sans-serif;
+  --font-raleway: 'Raleway', sans-serif;
+}
+
+/* Custom global layouts and behaviors */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-deep);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  width: 100%;
+}
+
+.no-scroll {
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Smooth scroll handling (managed via Lenis, but here as a fallback) */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Premium micro-interactions and transitions */
+.transition-premium {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--olive-primary);
+  outline-offset: 2px;
+}
+
+.font-orbitron {
+  font-family: "Orbitron", sans-serif;
+}
+
+.font-iceberg {
+  font-family: "Iceberg", sans-serif;
+}
+
+.font-raleway {
+  font-family: "Raleway", sans-serif;
+}
+
