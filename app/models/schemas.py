@@ -82,6 +82,7 @@ class PriorityZoneCell(BaseModel):
     elevation_mean: float
     slope_mean: float
     ndvi_mean: float
+    rainfall_mean: Optional[float] = None
     land_cover: str
     priority: str              # "Low", "Medium", "High", "Critical"
     priority_score: float      # 0 - 100
