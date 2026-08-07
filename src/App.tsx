@@ -122,7 +122,7 @@ const FieldNotificationsPage = lazy(
 
 type ProtectedRouteProps = {
   children: ReactElement;
-  allowedRole: GeoTwinRole;
+  allowedRole?: GeoTwinRole | GeoTwinRole[];
   user: UserSession | null;
   loading: boolean;
 };
@@ -141,17 +141,20 @@ function ProtectedRoute({
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role !== allowedRole) {
-    return (
-      <Navigate
-        to={
-          user.role === 'officer'
-            ? '/field/dashboard'
-            : '/supervisor/dashboard'
-        }
-        replace
-      />
-    );
+  if (allowedRole) {
+    const roles = Array.isArray(allowedRole) ? allowedRole : [allowedRole];
+    if (!roles.includes(user.role)) {
+      return (
+        <Navigate
+          to={
+            user.role === 'officer'
+              ? '/field/dashboard'
+              : '/supervisor/dashboard'
+          }
+          replace
+        />
+      );
+    }
   }
 
   return children;
@@ -345,7 +348,20 @@ function AppRoutes() {
           path="/field/map"
           element={
             <ProtectedRoute
-              allowedRole="officer"
+              allowedRole={['officer', 'supervisor']}
+              user={user}
+              loading={authLoading}
+            >
+              <AssignedLandMapPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/assigned-land"
+          element={
+            <ProtectedRoute
+              allowedRole={['officer', 'supervisor']}
               user={user}
               loading={authLoading}
             >
