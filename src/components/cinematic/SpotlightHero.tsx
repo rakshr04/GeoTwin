@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronDown, LogIn } from 'lucide-react';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
-import { GeotwinLogo } from '../shared/GeotwinLogo';
 
 interface SpotlightHeroProps {
   scrollProgress: number; // 0.0 to 1.0
@@ -67,13 +66,7 @@ export const SpotlightHero: React.FC<SpotlightHeroProps> = ({
       <div className="absolute inset-0 bg-[#0A0F14]/25 pointer-events-none z-0" />
 
       {/* Top Navbar */}
-      <header className="w-full px-6 md:px-12 py-6 flex items-center justify-between z-30 pointer-events-auto">
-        <div className="flex items-center gap-3">
-          <GeotwinLogo size={32} iconOnly={true} />
-          <span className="font-orbitron font-bold text-sm tracking-[0.2em] text-[#EEE9DC] uppercase">
-            GEOTWIN
-          </span>
-        </div>
+      <header className="w-full px-6 md:px-12 py-6 flex items-center justify-end z-30 pointer-events-auto">
         <a
           href="/login"
           className="font-mono text-xs font-semibold tracking-widest text-[#EEE9DC] hover:text-white border border-[#44503E]/60 hover:border-[#8A956B] px-5 py-2.5 rounded-xl transition-all duration-300 bg-[#1A2017]/80 backdrop-blur-md flex items-center gap-2 shadow-lg cursor-pointer hover:scale-105"
