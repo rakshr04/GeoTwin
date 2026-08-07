@@ -46,7 +46,7 @@ export default function FieldAssignmentDetailPage() {
 
   return (
     <FieldShell title="Assignment Details">
-      <div className="p-5 md:p-8 max-w-4xl mx-auto">
+      <div className="p-5 md:p-8 w-full">
         {error ? (
           <div className="mb-4 p-3 rounded-lg bg-[#FDF1F0] text-[#C65C52] text-xs">
             {error}

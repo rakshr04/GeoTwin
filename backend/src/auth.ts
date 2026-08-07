@@ -188,6 +188,8 @@ export class SupabaseAuthGuard implements CanActivate {
   ) {
     const url = this.config.get<string>('SUPABASE_URL')?.trim();
     const key = (
+      this.config.get<string>('SUPABASE_SECRET_KEY') ??
+      this.config.get<string>('SUPABASE_SERVICE_ROLE_KEY') ??
       this.config.get<string>('SUPABASE_PUBLISHABLE_KEY') ??
       this.config.get<string>('SUPABASE_ANON_KEY')
     )?.trim();

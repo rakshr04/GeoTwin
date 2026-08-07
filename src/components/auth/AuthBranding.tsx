@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { GeotwinLogo } from '../shared/GeotwinLogo';
 
 const Typewriter: React.FC<{ text: string; delay?: number; speed?: number }> = ({ text, delay = 0, speed = 40 }) => {
@@ -37,32 +37,6 @@ const Typewriter: React.FC<{ text: string; delay?: number; speed?: number }> = (
   );
 };
 
-const CountUp: React.FC<{ end: number; decimals?: number; duration?: number; suffix?: string }> = ({
-  end,
-  decimals = 0,
-  duration = 1400,
-  suffix = "",
-}) => {
-  const [count, setCount] = React.useState(0);
-
-  React.useEffect(() => {
-    let startTimestamp: number | null = null;
-    const step = (timestamp: number) => {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      // Ease out cubic
-      const easedProgress = 1 - Math.pow(1 - progress, 3);
-      setCount(easedProgress * end);
-      if (progress < 1) {
-        window.requestAnimationFrame(step);
-      }
-    };
-    window.requestAnimationFrame(step);
-  }, [end, duration]);
-
-  return <span>{count.toFixed(decimals)}{suffix}</span>;
-};
-
 export const AuthBranding: React.FC = () => {
   return (
     <div className="w-full max-w-lg flex flex-col justify-center space-y-8 text-text-primary auth-branding-container relative">
@@ -74,7 +48,6 @@ export const AuthBranding: React.FC = () => {
           <path d="M-10,170 Q40,130 90,170 T190,170" stroke="#8A956B" strokeWidth="0.8" />
           <circle cx="130" cy="70" r="1.5" fill="#8A956B" />
           <line x1="130" y1="70" x2="130" y2="160" stroke="#8A956B" strokeWidth="0.5" strokeDasharray="3 3" />
-          <text x="135" y="73" fill="#8A956B" fontSize="5" fontFamily="monospace" letterSpacing="1">Ref: GT-98</text>
         </svg>
       </div>
 
@@ -110,22 +83,6 @@ export const AuthBranding: React.FC = () => {
         <p className="text-xs md:text-sm text-[#B8C7D1]/70 leading-relaxed max-w-md animate-fade-in opacity-0 font-sans" style={{ animationDelay: '2.8s' }}>
           Access environmental intelligence, collaborative planning tools, and real-time topographical datasets built for government agency workflows.
         </p>
-      </div>
-
-      <div className="pt-6 flex items-center gap-8 border-t border-border-muted/30 animate-fade-in opacity-0" style={{ animationDelay: '3.0s' }}>
-        <div className="flex flex-col">
-          <span className="text-xl md:text-2xl font-bold text-[#EEE9DC] font-orbitron">
-            <CountUp end={12.4} decimals={1} suffix="M" />
-          </span>
-          <span className="text-[9px] uppercase font-mono tracking-widest text-[#B8C7D1]/50 mt-1">Acres Monitored</span>
-        </div>
-        <div className="h-8 w-px bg-border-muted/20" />
-        <div className="flex flex-col">
-          <span className="text-xl md:text-2xl font-bold text-[#EEE9DC] font-orbitron">
-            <CountUp end={98.4} decimals={1} suffix="%" />
-          </span>
-          <span className="text-[9px] uppercase font-mono tracking-widest text-[#B8C7D1]/50 mt-1">Scan Accuracy</span>
-        </div>
       </div>
 
       <style>{`

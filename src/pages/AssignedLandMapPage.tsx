@@ -18,7 +18,7 @@ export default function AssignedLandMapPage() {
       officerName={data?.officer.displayName}
       notificationCount={data?.notificationCount}
     >
-      <div className="p-5 md:p-8 max-w-7xl mx-auto">
+      <div className="p-5 md:p-8 w-full">
         {loading ? (
           <div className="h-[62vh] min-h-[420px] bg-[#FBFAEF] rounded-2xl animate-pulse" />
         ) : error || !data ? (

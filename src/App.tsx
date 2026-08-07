@@ -1,9 +1,11 @@
 import {
+  Component,
   Suspense,
   lazy,
   useEffect,
   useState,
   type ReactElement,
+  type ErrorInfo,
 } from 'react';
 import {
   BrowserRouter,
@@ -11,6 +13,64 @@ import {
   Route,
   Routes,
 } from 'react-router-dom';
+
+interface ErrorBoundaryProps {
+  children: ReactElement;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  public state: ErrorBoundaryState = {
+    hasError: false,
+    error: null,
+  };
+
+  public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('App Uncaught Error:', error, errorInfo);
+  }
+
+  public render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#0E130D] text-[#EEE9DC] flex items-center justify-center p-6 font-sans">
+          <div className="max-w-md w-full bg-[#1A2017] border border-[#44503E]/50 rounded-2xl p-6 text-center space-y-4 shadow-2xl">
+            <h2 className="text-lg font-bold text-red-400">Something went wrong</h2>
+            <p className="text-xs text-[#B9B6A7] leading-relaxed">
+              {this.state.error?.message || 'An unexpected error occurred while loading the workspace.'}
+            </p>
+            <div className="flex gap-3 justify-center pt-2">
+              <button
+                onClick={() => {
+                  localStorage.removeItem('gt_auth_user');
+                  window.location.href = '/login';
+                }}
+                className="px-4 py-2 bg-[#8A956B] text-[#171C15] font-bold text-xs rounded-xl hover:bg-[#A5B17C] transition-colors"
+              >
+                Return to Login
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-[#2D352B] text-[#EEE9DC] font-bold text-xs rounded-xl hover:bg-[#3E4A3B] transition-colors border border-[#44503E]/40"
+              >
+                Reload Page
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 import { LoadingFallback } from './components/shared/LoadingFallback';
 import {
@@ -167,16 +227,7 @@ function AppRoutes() {
 
         <Route
           path="/login"
-          element={
-            !authLoading && user ? (
-              <DashboardRedirect
-                user={user}
-                loading={authLoading}
-              />
-            ) : (
-              <LoginPage />
-            )
-          }
+          element={<LoginPage />}
         />
 
         <Route
@@ -363,9 +414,11 @@ function AppRoutes() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

@@ -206,4 +206,35 @@ export class SupervisorOperationsController {
   assignments(@CurrentUser() user: AuthenticatedUser) {
     return this.service.getSupervisorAssignments(user);
   }
+
+  @Patch('evidence/:evidenceId/review')
+  reviewEvidence(
+    @Param('evidenceId') evidenceId: string,
+    @Body() dto: { status: string; notes?: string },
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.service.reviewEvidence(evidenceId, dto.status, dto.notes, user);
+  }
+
+  @Patch('field-officers/:officerId/attendance')
+  toggleAttendance(
+    @Param('officerId') officerId: string,
+    @Body() dto: { status: string },
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.service.toggleAttendance(officerId, dto.status, user);
+  }
+
+  @Get('audit-logs')
+  auditLogs(@CurrentUser() user: AuthenticatedUser) {
+    return this.service.getAuditLogs(user);
+  }
+
+  @Post('audit-logs')
+  createAuditLog(
+    @Body() dto: any,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.service.createAuditLog(dto, user);
+  }
 }

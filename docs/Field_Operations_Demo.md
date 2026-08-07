@@ -24,6 +24,7 @@ DATABASE_SSL=true
 FRONTEND_ORIGIN=http://localhost:5173
 SUPABASE_URL=
 SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SECRET_KEY=
 ```
 
 `VITE_MAPBOX_ACCESS_TOKEN` is optional. When omitted, the assigned-land page

@@ -29,3 +29,6 @@ backend/storage/uploads/*
 *.sw?
 
 frontend-old-backup/
+demigod/
+geotwin-cinematic-demo/
+.agents/
