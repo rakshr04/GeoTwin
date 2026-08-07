@@ -189,6 +189,7 @@ export const InteractiveGISMap: React.FC<InteractiveGISMapProps> = ({
             <b>Elevation:</b> ${zone.elevation_mean} m<br/>
             <b>Slope:</b> ${zone.slope_mean}&deg;<br/>
             <b>NDVI:</b> ${zone.ndvi_mean}<br/>
+            <b>Rainfall:</b> ${zone.rainfall_mean ? zone.rainfall_mean + ' mm' : 'N/A'}<br/>
             <b>Land Cover:</b> ${zone.land_cover}
           </div>
         </div>

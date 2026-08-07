@@ -20,6 +20,7 @@ export interface PriorityZone {
   elevation_mean: number;
   slope_mean: number;
   ndvi_mean: number;
+  rainfall_mean?: number;
   land_cover: string;
   priority: 'Low' | 'Medium' | 'High' | 'Critical' | string;
   priority_score: number;
