@@ -32,3 +32,11 @@ frontend-old-backup/
 demigod/
 geotwin-cinematic-demo/
 .agents/
+
+# Python
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
