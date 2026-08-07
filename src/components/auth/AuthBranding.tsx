@@ -56,14 +56,14 @@ export const AuthBranding: React.FC = () => {
         Ecosystem Grid Ref: 45.362Â° N, 122.188Â° W // Elevation: 1420m
       </div>
       <div className="space-y-6 text-center lg:text-left">
-        {/* Centered Glowing & Rotating Logo */}
-        <div className="flex justify-center lg:justify-start w-full my-4 animate-fade-in opacity-0" style={{ animationDelay: '0.1s' }}>
-          <div className="relative group p-2 flex items-center justify-center">
+        {/* Glowing & Rotating Logo - Shifted Right & Enlarged */}
+        <div className="flex justify-center lg:justify-start pl-0 lg:pl-16 w-full my-4 animate-fade-in opacity-0" style={{ animationDelay: '0.1s' }}>
+          <div className="relative group p-2 flex items-center justify-center translate-x-4 lg:translate-x-12">
             {/* Ambient Radial Green Glow */}
-            <div className="absolute inset-0 rounded-full bg-emerald-500/25 blur-2xl scale-150 animate-pulse pointer-events-none" />
+            <div className="absolute inset-0 rounded-full bg-emerald-500/30 blur-3xl scale-175 animate-pulse pointer-events-none" />
             {/* Slowly Rotating & Glowing Emblem */}
-            <div className="relative z-10 animate-[spin_40s_linear_infinite] drop-shadow-[0_0_30px_rgba(34,197,94,0.8)]">
-              <GeotwinLogo size={110} iconOnly={true} />
+            <div className="relative z-10 animate-[spin_40s_linear_infinite] drop-shadow-[0_0_40px_rgba(34,197,94,0.85)]">
+              <GeotwinLogo size={160} iconOnly={true} />
             </div>
           </div>
         </div>
