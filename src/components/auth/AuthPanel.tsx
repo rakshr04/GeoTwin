@@ -191,9 +191,9 @@ export const AuthPanel: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full">
-      {/* Intense Dark Yellowish-Green Radial Glow Backdrop */}
-      <div className="absolute -inset-4 rounded-[32px] bg-gradient-to-r from-[#8A956B]/35 via-[#A3B173]/40 to-[#556B2F]/35 blur-2xl animate-pulse pointer-events-none z-0" />
+    <div className="relative w-full group">
+      {/* Dark Yellowish-Green Radial Glow Backdrop - Activated ON HOVER ONLY */}
+      <div className="absolute -inset-4 rounded-[32px] bg-gradient-to-r from-[#8A956B]/40 via-[#A3B173]/50 to-[#556B2F]/40 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0" />
 
       <div
         ref={cardRef}
@@ -203,7 +203,7 @@ export const AuthPanel: React.FC = () => {
           ...tiltStyle,
           transformStyle: 'preserve-3d',
         }}
-        className="relative z-10 w-full bg-[#141C13]/90 border-2 border-[#A3B173]/70 p-6 md:p-8 rounded-[24px] shadow-[0_0_55px_rgba(163,177,115,0.45),0_0_100px_rgba(85,107,47,0.3)] text-[#EEE9DC] backdrop-blur-2xl auth-panel-card"
+        className="relative z-10 w-full bg-[#141C13]/90 border border-[#44503E]/50 hover:border-[#A3B173] p-6 md:p-8 rounded-[24px] shadow-[0_24px_50px_rgba(0,0,0,0.6)] hover:shadow-[0_0_60px_rgba(163,177,115,0.5),0_0_110px_rgba(85,107,47,0.35)] text-[#EEE9DC] backdrop-blur-2xl transition-all duration-500 auth-panel-card"
       >
       <div
         className="absolute inset-0 rounded-[24px] pointer-events-none z-30 transition-opacity duration-300"
