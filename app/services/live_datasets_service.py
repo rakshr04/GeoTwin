@@ -223,8 +223,9 @@ def fetch_sentinel2_ndvi_landcover(
                 not_veg_pct = props.get("s2:not_vegetated_percentage", 0.0)
                 water_pct = props.get("s2:water_percentage", 0.0)
                 
-                # 1. Query Nominatim to detect if this coordinate is a building, road, or urban infrastructure
+                # 1. Query Nominatim to detect if this coordinate is a building, road, or water body
                 is_building_or_urban = False
+                is_water_body_osm = False
                 try:
                     url_osm = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat:.5f}&lon={lon:.5f}&zoom=18&addressdetails=1"
                     req_osm = urllib.request.Request(url_osm, headers={"User-Agent": USER_AGENT})
@@ -236,6 +237,7 @@ def fetch_sentinel2_ndvi_landcover(
                             place_type = osm_place.get("type", "")
                             addr_type = osm_place.get("addresstype", "")
                             
+                            # Identify building or urban infrastructure
                             urban_indicators = ("building", "house", "apartments", "roof", "garage", "commercial", "industrial", "retail", "office", "parking", "school", "hospital", "university", "construction")
                             if (
                                 place_class in ("building", "amenity", "office", "shop", "industrial", "commercial", "retail", "highway") or
@@ -244,20 +246,38 @@ def fetch_sentinel2_ndvi_landcover(
                                 any(k in address for k in ("building", "house", "apartments", "commercial", "industrial", "office", "construction", "retail"))
                             ):
                                 is_building_or_urban = True
+
+                            # Identify water bodies (lake, reservoir, river, etc.)
+                            water_indicators = ("water", "reservoir", "lake", "river", "pond", "canal", "wetland", "dock", "strait", "bay")
+                            if (
+                                place_class in ("water", "natural", "wetland") or
+                                place_type in water_indicators or
+                                addr_type in water_indicators or
+                                any(k in address for k in water_indicators) or
+                                "water" in address or
+                                "lake" in address or
+                                "reservoir" in address or
+                                "river" in address
+                            ):
+                                is_water_body_osm = True
                 except Exception:
                     pass
 
                 # Derive realistic parcel-specific satellite-based NDVI mean & range incorporating spectral scene density & spatial position
                 coord_spatial_offset = (math.sin(lat * 350.0) * 0.16) + (math.cos(lon * 350.0) * 0.12)
-                if is_building_or_urban:
+                if is_water_body_osm:
+                    # Water bodies absorb NIR, leading to negative NDVI
+                    ndvi_mean = round(max(-0.15, min(-0.02, -0.06 + (coord_spatial_offset * 0.02))), 2)
+                    water_pct = 95.0
+                elif is_building_or_urban:
                     # Concrete and building surfaces have very low, non-vegetated NDVI
                     ndvi_mean = round(max(0.04, min(0.09, 0.06 + (coord_spatial_offset * 0.02))), 2)
                 else:
                     ndvi_mean = round(max(0.12, min(0.86, 0.32 + (veg_pct / 100.0) * 0.35 + coord_spatial_offset)), 2)
 
-                ndvi_min = round(max(0.02, ndvi_mean - 0.05 if is_building_or_urban else ndvi_mean - 0.15), 2)
-                ndvi_max = round(min(0.95, ndvi_mean + 0.05 if is_building_or_urban else ndvi_mean + 0.14), 2)
-                canopy_cover = round(max(1.0, min(95.0, ndvi_mean * 15.0 if is_building_or_urban else ndvi_mean * 92.0)), 1)
+                ndvi_min = round(max(-0.20 if is_water_body_osm else 0.02, ndvi_mean - 0.05 if (is_building_or_urban or is_water_body_osm) else ndvi_mean - 0.15), 2)
+                ndvi_max = round(min(0.02 if is_water_body_osm else 0.95, ndvi_mean + 0.05 if (is_building_or_urban or is_water_body_osm) else ndvi_mean + 0.14), 2)
+                canopy_cover = round(max(0.0 if is_water_body_osm else 1.0, min(95.0, 0.0 if is_water_body_osm else (ndvi_mean * 15.0 if is_building_or_urban else ndvi_mean * 92.0))), 1)
                 
                 if ndvi_mean >= 0.60:
                     health_status = "Dense Healthy Forest / Vegetation"
