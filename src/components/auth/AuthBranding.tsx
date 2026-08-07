@@ -55,21 +55,17 @@ export const AuthBranding: React.FC = () => {
       <div className="absolute -left-16 -bottom-40 font-mono text-[7.5px] text-[#8A956B]/30 tracking-[0.25em] uppercase select-none hidden lg:block">
         Ecosystem Grid Ref: 45.362Â° N, 122.188Â° W // Elevation: 1420m
       </div>
-      {/* Live System Operational Indicator */}
-      <div className="flex items-center space-x-2 bg-[#1b261b]/60 border border-[#2d402d]/60 px-3 py-1 rounded-full w-fit animate-fade-in opacity-0" style={{ animationDelay: '0.1s' }}>
-        <span className="relative flex h-1.5 w-1.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-        </span>
-        <span className="font-mono text-[9px] uppercase tracking-widest text-[#8A956B] font-semibold">
-          System Operational
-        </span>
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex items-start justify-between w-full animate-fade-in opacity-0" style={{ animationDelay: '0.2s' }}>
-          {/* Logo size increased further (96) */}
-          <GeotwinLogo className="mb-2 items-start" size={96} iconOnly={true} />
+      <div className="space-y-6 text-center lg:text-left">
+        {/* Centered Glowing & Rotating Logo */}
+        <div className="flex justify-center lg:justify-start w-full my-4 animate-fade-in opacity-0" style={{ animationDelay: '0.1s' }}>
+          <div className="relative group p-2 flex items-center justify-center">
+            {/* Ambient Radial Green Glow */}
+            <div className="absolute inset-0 rounded-full bg-emerald-500/25 blur-2xl scale-150 animate-pulse pointer-events-none" />
+            {/* Slowly Rotating & Glowing Emblem */}
+            <div className="relative z-10 animate-[spin_40s_linear_infinite] drop-shadow-[0_0_30px_rgba(34,197,94,0.8)]">
+              <GeotwinLogo size={110} iconOnly={true} />
+            </div>
+          </div>
         </div>
         
         <span className="inline-block text-[10px] font-semibold font-mono tracking-[0.35em] text-[#8A956B] uppercase animate-fade-in opacity-0" style={{ animationDelay: '0.3s' }}>
