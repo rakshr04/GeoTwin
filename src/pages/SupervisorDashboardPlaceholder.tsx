@@ -32,7 +32,7 @@ import {
   Download,
   Lock,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import { GeotwinLogo } from '../components/shared/GeotwinLogo';
 import { ApiError } from '../lib/apiClient';
@@ -836,17 +836,21 @@ export default function SupervisorDashboardPlaceholder() {
           <div className="space-y-6 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {/* Logo & Platform Title */}
             <div className="flex items-center justify-between pl-1">
-              <div className="flex items-center gap-3">
-                <GeotwinLogo size={30} iconOnly />
+              <Link
+                to="/"
+                title="Return to GeoTwin Home"
+                className="flex items-center gap-3 group cursor-pointer"
+              >
+                <GeotwinLogo size={44} iconOnly />
                 <div>
-                  <span className="font-semibold text-sm text-[#F8FAF8] tracking-tight block">
-                    Geotwin GIS
+                  <span className="font-bold text-base text-[#F8FAF8] group-hover:text-[#76B78C] transition-colors tracking-tight block">
+                    GeoTwin
                   </span>
-                  <span className="text-[11px] font-medium text-[#76B78C] block">
+                  <span className="text-[10px] font-semibold text-[#76B78C] block uppercase tracking-wider font-mono">
                     Control Centre
                   </span>
                 </div>
-              </div>
+              </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="md:hidden text-[#94C7A5] hover:text-[#F8FAF8] p-1"

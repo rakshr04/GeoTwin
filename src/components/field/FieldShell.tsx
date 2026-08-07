@@ -118,15 +118,16 @@ export function FieldShell({
       <aside className="w-64 bg-[#0D2A26] border-0 p-6 hidden md:flex flex-col justify-between shrink-0 shadow-2xl z-40">
         <div className="space-y-8">
           <NavLink
-            to="/field/dashboard"
-            className="flex items-center space-x-2.5 pl-1"
+            to="/"
+            title="Return to GeoTwin Home"
+            className="flex items-center space-x-3 pl-1 group cursor-pointer"
           >
-            <GeotwinLogo size={32} iconOnly />
+            <GeotwinLogo size={44} iconOnly />
             <div className="min-w-0">
-              <span className="font-semibold text-sm tracking-tight text-[#F8FAF8] block">
-                Geotwin GIS
+              <span className="font-bold text-base tracking-tight text-[#F8FAF8] group-hover:text-[#76B78C] transition-colors block">
+                GeoTwin
               </span>
-              <span className="text-[10px] font-medium text-[#76B78C] block uppercase tracking-wider font-mono">
+              <span className="text-[10px] font-semibold text-[#76B78C] block uppercase tracking-wider font-mono">
                 Field Operations
               </span>
             </div>
