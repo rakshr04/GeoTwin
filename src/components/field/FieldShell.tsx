@@ -161,7 +161,7 @@ export function FieldShell({
                         <span
                           className={`min-w-5 h-5 px-1 rounded-full text-[#F8FAF8] text-[9px] font-bold font-mono flex items-center justify-center transition-all ${
                             isGreen
-                              ? 'bg-[#22C55E] shadow-[0_0_10px_#22C55E]'
+                              ? 'bg-[#15803D] shadow-[0_0_12px_rgba(21,128,61,0.8)] animate-pulse'
                               : 'bg-[#EF4444] shadow-[0_0_8px_#EF4444]'
                           }`}
                         >
