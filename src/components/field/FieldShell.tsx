@@ -73,12 +73,21 @@ export function FieldShell({
   const navigate = useNavigate();
   const location = useLocation();
   const [actualCount, setActualCount] = useState<number>(notificationCount ?? 0);
+  const [hasViewedNotifs, setHasViewedNotifs] = useState<boolean>(
+    location.pathname.includes('/field/notifications')
+  );
 
   useEffect(() => {
     if (typeof notificationCount === 'number') {
       setActualCount(notificationCount);
     }
   }, [notificationCount]);
+
+  useEffect(() => {
+    if (location.pathname.includes('/field/notifications')) {
+      setHasViewedNotifs(true);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     let isMounted = true;
@@ -127,6 +136,11 @@ export function FieldShell({
               <NavLink
                 key={to}
                 to={to}
+                onClick={() => {
+                  if (to === '/field/notifications') {
+                    setHasViewedNotifs(true);
+                  }
+                }}
                 className={({ isActive }) =>
                   `w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium transition-all ${
                     isActive
@@ -135,16 +149,28 @@ export function FieldShell({
                   }`
                 }
               >
-                <span className="flex items-center gap-3">
-                  <Icon className="w-4 h-4 text-[#94C7A5]" />
-                  {label}
-                </span>
-                {to === '/field/notifications' &&
-                actualCount > 0 ? (
-                  <span className="min-w-5 h-5 px-1 rounded-full bg-[#EF4444] text-[#F8FAF8] text-[9px] font-bold font-mono flex items-center justify-center shadow-[0_0_8px_#EF4444]">
-                    {actualCount}
-                  </span>
-                ) : null}
+                {({ isActive }) => {
+                  const isGreen = to === '/field/notifications' && (isActive || hasViewedNotifs);
+                  return (
+                    <>
+                      <span className="flex items-center gap-3">
+                        <Icon className="w-4 h-4 text-[#94C7A5]" />
+                        {label}
+                      </span>
+                      {to === '/field/notifications' && actualCount > 0 ? (
+                        <span
+                          className={`min-w-5 h-5 px-1 rounded-full text-[#F8FAF8] text-[9px] font-bold font-mono flex items-center justify-center transition-all ${
+                            isGreen
+                              ? 'bg-[#22C55E] shadow-[0_0_10px_#22C55E]'
+                              : 'bg-[#EF4444] shadow-[0_0_8px_#EF4444]'
+                          }`}
+                        >
+                          {actualCount}
+                        </span>
+                      ) : null}
+                    </>
+                  );
+                }}
               </NavLink>
             ))}
             <button
