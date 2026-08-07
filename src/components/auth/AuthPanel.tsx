@@ -1,4 +1,4 @@
-﻿import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Eye,
@@ -191,16 +191,20 @@ export const AuthPanel: React.FC = () => {
   };
 
   return (
-    <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        ...tiltStyle,
-        transformStyle: 'preserve-3d',
-      }}
-      className="relative w-full bg-[#1A2017]/85 border border-[#44503E]/45 p-6 md:p-8 rounded-[24px] shadow-[0_24px_50px_rgba(0,0,0,0.6)] text-[#EEE9DC] backdrop-blur-xl auth-panel-card"
-    >
+    <div className="relative w-full">
+      {/* Intense Dark Yellowish-Green Radial Glow Backdrop */}
+      <div className="absolute -inset-4 rounded-[32px] bg-gradient-to-r from-[#8A956B]/35 via-[#A3B173]/40 to-[#556B2F]/35 blur-2xl animate-pulse pointer-events-none z-0" />
+
+      <div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          ...tiltStyle,
+          transformStyle: 'preserve-3d',
+        }}
+        className="relative z-10 w-full bg-[#141C13]/90 border-2 border-[#A3B173]/70 p-6 md:p-8 rounded-[24px] shadow-[0_0_55px_rgba(163,177,115,0.45),0_0_100px_rgba(85,107,47,0.3)] text-[#EEE9DC] backdrop-blur-2xl auth-panel-card"
+      >
       <div
         className="absolute inset-0 rounded-[24px] pointer-events-none z-30 transition-opacity duration-300"
         style={lightStyle}
@@ -459,6 +463,7 @@ export const AuthPanel: React.FC = () => {
           background-color: #A5B17C;
         }
       `}</style>
+      </div>
     </div>
   );
 };
