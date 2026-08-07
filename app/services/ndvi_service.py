@@ -18,7 +18,7 @@ def classify_ndvi_vegetation(ndvi_val: float, water_coverage_pct: float = 0.0, t
     if water_coverage_pct > 60.0:
         return "Water Body Surface"
     if ndvi_val < 0.10:
-        return "Bare Land / Non-Vegetated"
+        return "Built-up / Bare Soil"
     elif ndvi_val < 0.30:
         return "Sparse Vegetation"
     elif ndvi_val < 0.55:
