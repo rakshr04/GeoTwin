@@ -159,9 +159,9 @@ export function FieldShell({
                       </span>
                       {to === '/field/notifications' && actualCount > 0 ? (
                         <span
-                          className={`min-w-5 h-5 px-1 rounded-full text-[#F8FAF8] text-[9px] font-bold font-mono flex items-center justify-center transition-all ${
+                          className={`min-w-5 h-5 px-1 rounded-full text-[#F8FAF8] text-[9px] font-bold font-mono flex items-center justify-center transition-all opacity-100 ${
                             isGreen
-                              ? 'bg-[#15803D] shadow-[0_0_12px_rgba(21,128,61,0.8)] animate-pulse'
+                              ? 'bg-[#15803D] shadow-[0_0_10px_rgba(21,128,61,0.9)]'
                               : 'bg-[#EF4444] shadow-[0_0_8px_#EF4444]'
                           }`}
                         >
