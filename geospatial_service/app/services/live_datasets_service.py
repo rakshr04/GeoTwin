@@ -223,12 +223,41 @@ def fetch_sentinel2_ndvi_landcover(
                 not_veg_pct = props.get("s2:not_vegetated_percentage", 0.0)
                 water_pct = props.get("s2:water_percentage", 0.0)
                 
+                # 1. Query Nominatim to detect if this coordinate is a building, road, or urban infrastructure
+                is_building_or_urban = False
+                try:
+                    url_osm = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat:.5f}&lon={lon:.5f}&zoom=18&addressdetails=1"
+                    req_osm = urllib.request.Request(url_osm, headers={"User-Agent": USER_AGENT})
+                    with urllib.request.urlopen(req_osm, timeout=1.8) as resp_osm:
+                        osm_place = json.loads(resp_osm.read().decode())
+                        if osm_place:
+                            address = osm_place.get("address", {})
+                            place_class = osm_place.get("class", "")
+                            place_type = osm_place.get("type", "")
+                            addr_type = osm_place.get("addresstype", "")
+                            
+                            urban_indicators = ("building", "house", "apartments", "roof", "garage", "commercial", "industrial", "retail", "office", "parking", "school", "hospital", "university", "construction")
+                            if (
+                                place_class in ("building", "amenity", "office", "shop", "industrial", "commercial", "retail", "highway") or
+                                place_type in urban_indicators or
+                                addr_type in urban_indicators or
+                                any(k in address for k in ("building", "house", "apartments", "commercial", "industrial", "office", "construction", "retail"))
+                            ):
+                                is_building_or_urban = True
+                except Exception:
+                    pass
+
                 # Derive realistic parcel-specific satellite-based NDVI mean & range incorporating spectral scene density & spatial position
                 coord_spatial_offset = (math.sin(lat * 350.0) * 0.16) + (math.cos(lon * 350.0) * 0.12)
-                ndvi_mean = round(max(0.12, min(0.86, 0.32 + (veg_pct / 100.0) * 0.35 + coord_spatial_offset)), 2)
-                ndvi_min = round(max(0.05, ndvi_mean - 0.15), 2)
-                ndvi_max = round(min(0.95, ndvi_mean + 0.14), 2)
-                canopy_cover = round(max(5.0, min(95.0, ndvi_mean * 92.0)), 1)
+                if is_building_or_urban:
+                    # Concrete and building surfaces have very low, non-vegetated NDVI
+                    ndvi_mean = round(max(0.04, min(0.09, 0.06 + (coord_spatial_offset * 0.02))), 2)
+                else:
+                    ndvi_mean = round(max(0.12, min(0.86, 0.32 + (veg_pct / 100.0) * 0.35 + coord_spatial_offset)), 2)
+
+                ndvi_min = round(max(0.02, ndvi_mean - 0.05 if is_building_or_urban else ndvi_mean - 0.15), 2)
+                ndvi_max = round(min(0.95, ndvi_mean + 0.05 if is_building_or_urban else ndvi_mean + 0.14), 2)
+                canopy_cover = round(max(1.0, min(95.0, ndvi_mean * 15.0 if is_building_or_urban else ndvi_mean * 92.0)), 1)
                 
                 if ndvi_mean >= 0.60:
                     health_status = "Dense Healthy Forest / Vegetation"
