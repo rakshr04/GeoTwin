@@ -1,6 +1,7 @@
 import math
 import logging
 from typing import Dict, Any, Tuple, Optional
+from fastapi import HTTPException
 
 logger = logging.getLogger("geospatial_service.ndvi")
 
@@ -62,13 +63,10 @@ def compute_ndvi_metrics(
         sat_source = live_stac["satellite_source"]
         acq_date = live_stac["satellite_acquisition_date"]
     else:
-        # Standard satellite baseline if cloud cover high or API unavailable
-        ndvi_mean = 0.35
-        ndvi_min = 0.20
-        ndvi_max = 0.50
-        canopy_cover_pct = 33.0
-        sat_source = "Sentinel-2 L2A (Copernicus STAC)"
-        acq_date = "Latest Clear Pass"
+        raise HTTPException(
+            status_code=503,
+            detail="Sentinel-2 satellite imagery is currently unavailable for NDVI calculation. Mathematical fallbacks are disabled."
+        )
 
     health_status = classify_ndvi_vegetation(ndvi_mean, water_coverage_pct=water_coverage_pct, thresholds=custom_thresholds)
 

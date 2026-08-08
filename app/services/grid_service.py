@@ -110,8 +110,8 @@ def generate_grid_priority_zones(
                 if (regional_water and (regional_water.get("water_coverage_pct", 0.0) > 0.0 or regional_water.get("is_water_body"))):
                     reg_cov = regional_water.get("water_coverage_pct", 5.0)
                     if water_prob > 0.3:
-                        cell_is_water = True
                         cell_water_cov = min(100.0, reg_cov * 3.0)
+                        cell_is_water = cell_water_cov >= 50.0
                         water_dist_m = 0.0
                     elif water_prob > -0.2:
                         cell_is_water = False
@@ -179,7 +179,7 @@ def generate_grid_priority_zones(
                 
                 cell_ph = round(max(4.5, min(9.0, base_ph + soil_spatial_delta * 0.4)), 1)
                 cell_soc = round(max(0.5, min(8.0, base_soc + (cell_ndvi_mean * 1.5) - 0.2)), 2)
-                cell_soil_type = classify_soil_texture(cell_sand, cell_clay)
+                cell_soil_type = classify_soil_texture(cell_sand, cell_clay, cell_silt, cy)
 
                 soil_res = {
                     "type": cell_soil_type,
