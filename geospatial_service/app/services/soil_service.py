@@ -3,6 +3,7 @@ import logging
 import urllib.request
 from typing import Dict, Any, Optional, Tuple
 from shapely.geometry import Polygon, Point
+from app.services.live_datasets_service import fetch_soil_isric
 
 logger = logging.getLogger("geospatial_service.soil")
 

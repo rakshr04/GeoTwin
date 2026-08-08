@@ -215,107 +215,135 @@ def fetch_sentinel2_ndvi_landcover(
         with urllib.request.urlopen(req, timeout=3.0) as resp:
             data = json.loads(resp.read().decode())
             features = data.get("features", [])
-            if len(features) > 0:
-                props = features[0].get("properties", {})
-                acq_date = props.get("datetime", "")[:10]
-                cloud_pct = round(props.get("eo:cloud_cover", 0.0), 1)
-                veg_pct = props.get("s2:vegetation_percentage", 0.0)
-                not_veg_pct = props.get("s2:not_vegetated_percentage", 0.0)
-                water_pct = props.get("s2:water_percentage", 0.0)
-                
-                # 1. Query Nominatim to detect if this coordinate is a building, road, or water body
-                is_building_or_urban = False
-                is_water_body_osm = False
-                try:
-                    url_osm = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat:.5f}&lon={lon:.5f}&zoom=18&addressdetails=1"
-                    req_osm = urllib.request.Request(url_osm, headers={"User-Agent": USER_AGENT})
-                    with urllib.request.urlopen(req_osm, timeout=1.8) as resp_osm:
-                        osm_place = json.loads(resp_osm.read().decode())
-                        if osm_place:
-                            address = osm_place.get("address", {})
-                            place_class = osm_place.get("class", "")
-                            place_type = osm_place.get("type", "")
-                            addr_type = osm_place.get("addresstype", "")
-                            
-                            # Identify building or urban infrastructure
-                            urban_indicators = ("building", "house", "apartments", "roof", "garage", "commercial", "industrial", "retail", "office", "parking", "school", "hospital", "university", "construction")
-                            if (
-                                place_class in ("building", "amenity", "office", "shop", "industrial", "commercial", "retail", "highway") or
-                                place_type in urban_indicators or
-                                addr_type in urban_indicators or
-                                any(k in address for k in ("building", "house", "apartments", "commercial", "industrial", "office", "construction", "retail"))
-                            ):
-                                is_building_or_urban = True
+            if len(features) == 0:
+                raise RuntimeError("No cloud-free Sentinel-2 scenes found for the specified region.")
 
-                            # Identify water bodies (lake, reservoir, river, etc.)
-                            water_indicators = ("water", "reservoir", "lake", "river", "pond", "canal", "wetland", "dock", "strait", "bay")
-                            if (
-                                place_class in ("water", "natural", "wetland") or
-                                place_type in water_indicators or
-                                addr_type in water_indicators or
-                                any(k in address for k in water_indicators) or
-                                "water" in address or
-                                "lake" in address or
-                                "reservoir" in address or
-                                "river" in address
-                            ):
-                                is_water_body_osm = True
-                except Exception:
-                    pass
+            props = features[0].get("properties", {})
+            acq_date = props.get("datetime", "")[:10]
+            cloud_pct = round(props.get("eo:cloud_cover", 0.0), 1)
+            veg_pct = props.get("s2:vegetation_percentage", 0.0)
+            not_veg_pct = props.get("s2:not_vegetated_percentage", 0.0)
+            water_pct = props.get("s2:water_percentage", 0.0)
+            
+            # 1. Query Nominatim to detect if this coordinate is a building, road, or water body
+            is_building_or_urban = False
+            is_water_body_osm = False
+            try:
+                url_osm = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat:.5f}&lon={lon:.5f}&zoom=18&addressdetails=1"
+                req_osm = urllib.request.Request(url_osm, headers={"User-Agent": USER_AGENT})
+                with urllib.request.urlopen(req_osm, timeout=1.8) as resp_osm:
+                    osm_place = json.loads(resp_osm.read().decode())
+                    if osm_place:
+                        address = osm_place.get("address", {})
+                        place_class = osm_place.get("class", "")
+                        place_type = osm_place.get("type", "")
+                        addr_type = osm_place.get("addresstype", "")
+                        
+                        # Identify building or urban infrastructure
+                        urban_indicators = ("building", "house", "apartments", "roof", "garage", "commercial", "industrial", "retail", "office", "parking", "school", "hospital", "university", "construction")
+                        if (
+                            place_class in ("building", "amenity", "office", "shop", "industrial", "commercial", "retail") or
+                            place_type in urban_indicators or
+                            addr_type in urban_indicators or
+                            any(k in address for k in ("building", "house", "apartments", "commercial", "industrial", "office", "construction", "retail"))
+                        ):
+                            is_building_or_urban = True
 
-                # Derive realistic parcel-specific satellite-based NDVI mean & range incorporating spectral scene density & spatial position
-                coord_spatial_offset = (math.sin(lat * 350.0) * 0.16) + (math.cos(lon * 350.0) * 0.12)
-                if is_water_body_osm:
-                    # Water bodies absorb NIR, leading to negative NDVI
-                    ndvi_mean = round(max(-0.15, min(-0.02, -0.06 + (coord_spatial_offset * 0.02))), 2)
-                    water_pct = 95.0
-                elif is_building_or_urban:
-                    # Concrete and building surfaces have very low, non-vegetated NDVI
-                    ndvi_mean = round(max(0.04, min(0.09, 0.06 + (coord_spatial_offset * 0.02))), 2)
-                else:
-                    ndvi_mean = round(max(0.12, min(0.86, 0.32 + (veg_pct / 100.0) * 0.35 + coord_spatial_offset)), 2)
+                        # Identify water bodies (lake, reservoir, river, etc.)
+                        water_indicators = ("water", "reservoir", "lake", "river", "pond", "canal", "wetland", "dock", "strait", "bay")
+                        if (
+                            place_class in ("water", "wetland") or
+                            (place_class == "natural" and place_type in water_indicators) or
+                            place_type in water_indicators or
+                            addr_type in water_indicators
+                        ):
+                            is_water_body_osm = True
+            except Exception:
+                pass
 
-                ndvi_min = round(max(-0.20 if is_water_body_osm else 0.02, ndvi_mean - 0.05 if (is_building_or_urban or is_water_body_osm) else ndvi_mean - 0.15), 2)
-                ndvi_max = round(min(0.02 if is_water_body_osm else 0.95, ndvi_mean + 0.05 if (is_building_or_urban or is_water_body_osm) else ndvi_mean + 0.14), 2)
-                canopy_cover = round(max(0.0 if is_water_body_osm else 1.0, min(95.0, 0.0 if is_water_body_osm else (ndvi_mean * 15.0 if is_building_or_urban else ndvi_mean * 92.0))), 1)
-                
-                if ndvi_mean >= 0.60:
-                    health_status = "Dense Healthy Forest / Vegetation"
-                    primary_class = "Dense Forest & Canopy"
-                elif ndvi_mean >= 0.40:
-                    health_status = "Moderate Vegetation Cover"
-                    primary_class = "Open Forest & Scrubland"
-                elif ndvi_mean >= 0.20:
-                    health_status = "Sparse Scrubland"
-                    primary_class = "Agricultural / Open Scrubland"
-                else:
-                    health_status = "Degraded / Bare Soil"
-                    primary_class = "Bare Land / Built-up"
-                    
-                composition = {
-                    "Forest & Vegetation": round(max(0.0, min(100.0, ndvi_mean * 80.0)), 1),
-                    "Bare Land & Built-up": round(max(0.0, min(100.0, (1.0 - ndvi_mean) * 70.0)), 1),
-                    "Water Bodies": round(water_pct, 1),
-                    "Other": round(max(0.0, 100.0 - (ndvi_mean * 80.0) - ((1.0 - ndvi_mean) * 70.0) - water_pct), 1)
-                }
-                
-                logger.info(f"[LIVE SENTINEL-2] STAC returned acq_date={acq_date}, veg_pct={veg_pct:.1f}%, NDVI={ndvi_mean}")
-                return {
-                    "ndvi_mean": ndvi_mean,
-                    "ndvi_min": ndvi_min,
-                    "ndvi_max": ndvi_max,
-                    "health_status": health_status,
-                    "canopy_cover_pct": canopy_cover,
-                    "primary_class": primary_class,
-                    "composition": composition,
-                    "cloud_cover_pct": cloud_pct,
-                    "satellite_source": "Sentinel-2 L2A (Copernicus / STAC)",
-                    "satellite_acquisition_date": acq_date
-                }
+            # 2. Try to read true NDVI from Planetary Computer COG assets
+            assets = features[0].get("assets", {})
+            b04_unsigned = assets.get("B04", {}).get("href")
+            b08_unsigned = assets.get("B08", {}).get("href")
+
+            if not b04_unsigned or not b08_unsigned:
+                raise RuntimeError("Required Sentinel-2 bands (B04, B08) are missing in the STAC asset metadata.")
+
+            try:
+                def sign_pc_url(unsigned_url):
+                    sign_api = f"https://planetarycomputer.microsoft.com/api/sas/v1/sign?href={unsigned_url}"
+                    req_sign = urllib.request.Request(sign_api, headers={"User-Agent": USER_AGENT})
+                    with urllib.request.urlopen(req_sign, timeout=2.0) as resp_sign:
+                        return json.loads(resp_sign.read().decode())["href"]
+
+                b04_signed = sign_pc_url(b04_unsigned)
+                b08_signed = sign_pc_url(b08_unsigned)
+
+                import rasterio
+                import numpy as np
+                from pyproj import Transformer
+                from rasterio.windows import Window
+
+                with rasterio.open(b04_signed) as src_b4, rasterio.open(b08_signed) as src_b8:
+                    transformer = Transformer.from_crs("EPSG:4326", src_b4.crs, always_xy=True)
+                    x, y = transformer.transform(lon, lat)
+                    row, col = src_b4.index(x, y)
+
+                    win = Window(col - 1, row - 1, 3, 3)
+                    red_pixels = src_b4.read(1, window=win).astype(float)
+                    nir_pixels = src_b8.read(1, window=win).astype(float)
+
+                    denom = nir_pixels + red_pixels
+                    denom[denom == 0] = 0.0001
+                    ndvi_matrix = (nir_pixels - red_pixels) / denom
+                    ndvi_matrix = np.clip(ndvi_matrix, -1.0, 1.0)
+
+                    ndvi_mean = round(float(np.mean(ndvi_matrix)), 2)
+                    ndvi_min = round(float(np.min(ndvi_matrix)), 2)
+                    ndvi_max = round(float(np.max(ndvi_matrix)), 2)
+                    canopy_cover = round(max(0.0, min(100.0, ndvi_mean * 100.0)), 1) if ndvi_mean > 0.0 else 0.0
+                    logger.info(f"[LIVE SENTINEL-2] Successfully calculated true NDVI from COG: mean={ndvi_mean}")
+            except Exception as ex:
+                logger.error(f"[LIVE SENTINEL-2] COG reading or NDVI calculation failed: {ex}")
+                raise RuntimeError(f"Sentinel-2 NDVI calculation failed: {ex}")
+
+            if ndvi_mean >= 0.60:
+                health_status = "Dense Healthy Forest / Vegetation"
+                primary_class = "Dense Forest & Canopy"
+            elif ndvi_mean >= 0.40:
+                health_status = "Moderate Vegetation Cover"
+                primary_class = "Open Forest & Scrubland"
+            elif ndvi_mean >= 0.20:
+                health_status = "Sparse Scrubland"
+                primary_class = "Agricultural / Open Scrubland"
+            else:
+                health_status = "Degraded / Bare Soil"
+                primary_class = "Bare Land / Built-up"
+
+            composition = {
+                "Forest & Vegetation": round(max(0.0, min(100.0, ndvi_mean * 80.0)), 1) if ndvi_mean > 0.0 else 0.0,
+                "Bare Land & Built-up": round(max(0.0, min(100.0, (1.0 - ndvi_mean) * 70.0)), 1) if ndvi_mean > 0.0 else 95.0,
+                "Water Bodies": round(water_pct, 1),
+                "Other": round(max(0.0, 100.0 - (max(0.0, ndvi_mean * 80.0) if ndvi_mean > 0.0 else 0.0) - (max(0.0, (1.0 - ndvi_mean) * 70.0) if ndvi_mean > 0.0 else 95.0) - water_pct), 1)
+            }
+
+            logger.info(f"[LIVE SENTINEL-2] STAC returned acq_date={acq_date}, veg_pct={veg_pct:.1f}%, NDVI={ndvi_mean}")
+            return {
+                "ndvi_mean": ndvi_mean,
+                "ndvi_min": ndvi_min,
+                "ndvi_max": ndvi_max,
+                "health_status": health_status,
+                "canopy_cover_pct": canopy_cover,
+                "primary_class": primary_class,
+                "composition": composition,
+                "cloud_cover_pct": cloud_pct,
+                "satellite_source": "Sentinel-2 L2A (Copernicus / STAC)",
+                "satellite_acquisition_date": acq_date
+            }
 
     except Exception as err:
-        logger.warning(f"[LIVE SENTINEL-2] STAC query failed/timed out: {err}")
-    return None
+        logger.error(f"[LIVE SENTINEL-2] STAC query failed: {err}")
+        raise RuntimeError(f"[LIVE SENTINEL-2] STAC query failed: {err}")
 
 
 @lru_cache(maxsize=128)
